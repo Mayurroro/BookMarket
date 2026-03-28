@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Browse Books | BookMarket</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#dfe3e8",
+              "on-secondary-fixed-variant": "#43474c",
+              "tertiary-fixed-dim": "#e8bdaa",
+              "on-tertiary-fixed-variant": "#5e4032",
+              "on-primary": "#ffffff",
+              "outline-variant": "#c1c8c7",
+              "secondary-fixed-dim": "#c3c7cc",
+              "on-error-container": "#93000a",
+              "surface-container": "#edeeef",
+              "tertiary-fixed": "#ffdbcc",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "on-secondary-fixed": "#181c20",
+              "on-tertiary-container": "#b89180",
+              "surface-variant": "#e1e3e4",
+              "surface": "#f8f9fa",
+              "on-primary-container": "#829f9f",
+              "on-error": "#ffffff",
+              "inverse-surface": "#2e3132",
+              "surface-bright": "#f8f9fa",
+              "secondary-container": "#dde0e6",
+              "secondary": "#5b5f64",
+              "on-tertiary-fixed": "#2d160a",
+              "primary-container": "#1a3636",
+              "tertiary": "#2e170b",
+              "on-primary-fixed-variant": "#304b4b",
+              "surface-container-highest": "#e1e3e4",
+              "primary-fixed": "#cae8e8",
+              "inverse-primary": "#aecccc",
+              "outline": "#727878",
+              "on-surface-variant": "#414848",
+              "surface-container-low": "#f3f4f5",
+              "surface-container-high": "#e7e8e9",
+              "primary": "#032121",
+              "surface-dim": "#d9dadb",
+              "on-background": "#191c1d",
+              "inverse-on-surface": "#f0f1f2",
+              "surface-tint": "#476363",
+              "error": "#ba1a1a",
+              "background": "#f8f9fa",
+              "primary-fixed-dim": "#aecccc",
+              "on-surface": "#191c1d",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed": "#022020",
+              "tertiary-container": "#462b1e",
+              "error-container": "#ffdad6",
+              "on-secondary-container": "#5f6368"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        display: inline-block;
+        line-height: 1;
+        text-transform: none;
+        letter-spacing: normal;
+        word-wrap: normal;
+        white-space: nowrap;
+        direction: ltr;
+      }
+      .book-card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+      }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- TopNavBar Component -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm dark:shadow-none font-['Manrope'] antialiased">
+<div class="flex items-center justify-between px-8 py-4 max-w-screen-2xl mx-auto w-full">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tight text-[#1A3636] dark:text-teal-400">BookMarket</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#1A3636] dark:hover:text-teal-300 transition-colors" href="#">Home</a>
+<a class="text-[#1A3636] dark:text-teal-400 font-extrabold border-b-2 border-[#1A3636] dark:border-teal-400 pb-1" href="#">Browse Books</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-[#1A3636] dark:hover:text-teal-300 transition-colors" href="#">Profile</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-5 py-2 text-sm font-semibold rounded-lg text-[#1A3636] hover:bg-slate-100/50 transition-all">Logout</button>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-20 px-8 max-w-screen-2xl mx-auto">
+<!-- Page Header -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h1 class="text-5xl font-extrabold font-headline tracking-tight text-primary mb-3">Browse Books</h1>
+<p class="text-lg text-secondary font-medium">Discover affordable pre-loved books from our curated community.</p>
+</div>
+<button class="flex items-center gap-2 px-6 py-3.5 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-xl font-bold shadow-lg shadow-primary/10 hover:opacity-90 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">add</span>
+                Add Book
+            </button>
+</header>
+<!-- Search & Filter Bar -->
+<section class="bg-surface-container-lowest p-2 rounded-full shadow-sm mb-16 flex flex-col lg:flex-row items-center gap-2">
+<div class="flex-1 flex items-center px-6 gap-3 w-full">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline py-3" placeholder="Search by title, author, or ISBN..." type="text"/>
+</div>
+<div class="h-8 w-px bg-outline-variant hidden lg:block"></div>
+<div class="flex items-center gap-2 px-2 overflow-x-auto no-scrollbar w-full lg:w-auto">
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-container text-on-surface font-medium whitespace-nowrap hover:bg-surface-container-high transition-colors">
+                    Category
+                    <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-container text-on-surface font-medium whitespace-nowrap hover:bg-surface-container-high transition-colors">
+                    Condition
+                    <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-surface-container text-on-surface font-medium whitespace-nowrap hover:bg-surface-container-high transition-colors">
+                    Price Range
+                    <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<div class="lg:ml-2">
+<button class="p-3 bg-primary text-on-primary rounded-full hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Books Grid -->
+<div id="books-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
+</div>
+<!-- Pagination -->
+<div class="mt-20 flex justify-center">
+<button class="px-12 py-4 border-2 border-primary text-primary font-bold rounded-full hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                Load More Books
+            </button>
+</div>
+</main>
+<!-- Footer Component -->
+<footer class="w-full py-12 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-['Manrope'] text-sm tracking-wide">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 max-w-screen-2xl mx-auto w-full gap-8">
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="font-bold text-[#1A3636] dark:text-teal-400 text-lg">BookMarket</span>
+<span class="text-slate-500 dark:text-slate-400">© 2024 BookMarket. The Digital Curator.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#1A3636] dark:hover:text-teal-300 hover:translate-y-[-1px] transition-transform" href="#">Terms of Service</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#1A3636] dark:hover:text-teal-300 hover:translate-y-[-1px] transition-transform" href="#">Privacy Policy</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#1A3636] dark:hover:text-teal-300 hover:translate-y-[-1px] transition-transform" href="#">Contact Support</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#1A3636] dark:hover:text-teal-300 hover:translate-y-[-1px] transition-transform" href="#">Our Mission</a>
+</div>
+</div>
+</footer>
+<script src="/static/js/app.js"></script>
+<script>
+(function () {
+  var PLACEHOLDER_IMG =
+    "data:image/svg+xml," +
+    encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><rect fill="#e7e8e9" width="100%" height="100%"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#727878" font-family="system-ui,sans-serif" font-size="14">No image</text></svg>'
+    );
+
+  function escapeHtml(text) {
+    if (text == null) return "";
+    var div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function escapeAttr(text) {
+    if (text == null) return "";
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;");
+  }
+
+  function createBrowseBookCard(book) {
+    var article = document.createElement("article");
+    article.className =
+      "group relative flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 book-card-hover";
+
+    var imgSrc = book.image_url ? String(book.image_url) : PLACEHOLDER_IMG;
+    var discountPct =
+      book.original_price != null &&
+      book.original_price > book.price
+        ? Math.round((1 - book.price / book.original_price) * 100)
+        : 0;
+    var showDiscount = discountPct > 0;
+
+    var categoryHtml = book.category
+      ? '<span class="px-2 py-0.5 bg-primary-container text-on-primary-container rounded-md text-[10px] font-bold uppercase tracking-widest">' +
+        escapeHtml(book.category) +
+        "</span>"
+      : "";
+
+    var originalHtml =
+      book.original_price != null
+        ? '<span class="text-sm text-outline line-through">₹' +
+          Number(book.original_price).toFixed(2) +
+          "</span>"
+        : "";
+
+    var descHtml = book.description ? escapeHtml(book.description) : "";
+
+    var viewBtn = !book.is_sold
+      ? '<button type="button" class="px-6 py-2.5 bg-on-primary text-primary font-bold rounded-lg transform translate-y-4 group-hover:translate-y-0 transition-transform" onclick="buyBook(' +
+        book.id +
+        ')">View Details</button>'
+      : '<button type="button" class="px-6 py-2.5 bg-on-primary/50 text-primary font-bold rounded-lg transform translate-y-4 group-hover:translate-y-0 transition-transform cursor-not-allowed" disabled>Sold Out</button>';
+
+    article.innerHTML =
+      '<div class="relative aspect-[3/4] overflow-hidden bg-surface-container-low">' +
+      '<img alt="' +
+      escapeAttr(book.title) +
+      '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="' +
+      escapeAttr(book.description || book.title) +
+      '" src="' +
+      escapeAttr(imgSrc) +
+      '"/>' +
+      (showDiscount
+        ? '<div class="absolute top-3 left-3 bg-error text-on-error px-2.5 py-1 rounded-md text-xs font-bold tracking-wider">' +
+          discountPct +
+          "% OFF</div>"
+        : "") +
+      '<div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 duration-300">' +
+      viewBtn +
+      "</div>" +
+      "</div>" +
+      '<div class="p-5 flex flex-col flex-1">' +
+      '<div class="flex items-center gap-2 mb-3">' +
+      categoryHtml +
+      '<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded-md text-[10px] font-bold uppercase tracking-widest">' +
+      escapeHtml(book.condition) +
+      "</span>" +
+      "</div>" +
+      '<h3 class="text-xl font-headline font-bold text-on-surface line-clamp-1 mb-1">' +
+      escapeHtml(book.title) +
+      "</h3>" +
+      '<p class="text-sm text-secondary font-medium mb-3">' +
+      escapeHtml(book.author) +
+      "</p>" +
+      '<p class="text-sm text-on-surface-variant line-clamp-2 mb-4 leading-relaxed italic">' +
+      descHtml +
+      "</p>" +
+      '<div class="mt-auto flex items-baseline gap-2">' +
+      '<span class="text-xl font-headline font-extrabold text-primary">₹' +
+      Number(book.price).toFixed(2) +
+      "</span>" +
+      originalHtml +
+      "</div>" +
+      "</div>";
+
+    return article;
+  }
+
+  async function loadBrowseBooks() {
+    var container = document.getElementById("books-container");
+    if (!container) return;
+    container.innerHTML = "";
+    try {
+      var response = await fetch("/api/books");
+      if (!response.ok) throw new Error("Failed to load books");
+      var data = await response.json();
+      console.log(data);
+      if (!data.length) {
+        container.innerHTML =
+          '<p class="col-span-full text-center text-on-surface-variant py-12">No books available at the moment.</p>';
+        return;
+      }
+      data.forEach(function (book) {
+        container.appendChild(createBrowseBookCard(book));
+      });
+    } catch (e) {
+      console.error(e);
+      container.innerHTML =
+        '<p class="col-span-full text-center text-on-surface-variant py-12">Could not load books.</p>';
+    }
+  }
+
+  loadBrowseBooks();
+})();
+</script>
+</body></html>

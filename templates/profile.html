@@ -1,215 +1,596 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - BookMarket</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <h1>📚 BookMarket</h1>
-            </div>
-            <div class="nav-links">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/books" class="nav-link">Browse Books</a>
-                <a href="/profile" class="nav-link active">Profile</a>
-                <button class="btn-logout" id="logoutBtn">Logout</button>
-            </div>
-        </div>
-    </nav>
 
-    <main class="container">
-        <div class="profile-header">
-            <h1>My Profile</h1>
-            <div id="userInfo" class="user-info-card">
-                <div class="user-avatar">👤</div>
-                <div class="user-details">
-                    <h2 id="userName">Loading...</h2>
-                    <p id="userEmail">Loading...</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="profile-tabs">
-            <button class="tab-btn active" data-tab="all">All Books</button>
-            <button class="tab-btn" data-tab="available">Available</button>
-            <button class="tab-btn" data-tab="sold">Sold</button>
-        </div>
-
-        <div id="myBooksContainer" class="books-grid">
-            <!-- User's books will be loaded here -->
-        </div>
-
-        <div id="loadingMessage" class="loading-message">Loading your books...</div>
-        <div id="noBooksMessage" class="no-books-message" style="display: none;">
-            <p>You haven't listed any books yet. <a href="/books">List your first book!</a></p>
-        </div>
-    </main>
-
-    <script src="/static/js/app.js"></script>
-    <script>
-        // Check authentication
-        if (!isAuthenticated()) {
-            window.location.href = '/login';
-        } else {
-            loadUserInfo();
-            loadMyBooks();
-        }
-
-        // Tab switching
-        let currentFilter = 'all';
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentFilter = btn.dataset.tab;
-                loadMyBooks();
-            });
-        });
-
-        async function loadUserInfo() {
-            const token = localStorage.getItem('token');
-            try {
-                const response = await fetch('/api/auth/me', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    const user = await response.json();
-                    document.getElementById('userName').textContent = user.full_name || user.username;
-                    document.getElementById('userEmail').textContent = user.email;
-                }
-            } catch (error) {
-                console.error('Failed to load user info:', error);
-            }
-        }
-
-        async function loadMyBooks() {
-            const token = localStorage.getItem('token');
-            const container = document.getElementById('myBooksContainer');
-            const loadingMsg = document.getElementById('loadingMessage');
-            const noBooksMsg = document.getElementById('noBooksMessage');
-
-            loadingMsg.style.display = 'block';
-            container.innerHTML = '';
-
-            try {
-                const response = await fetch('/api/users/me/books', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    const books = await response.json();
-                    let filteredBooks = books;
-
-                    if (currentFilter === 'available') {
-                        filteredBooks = books.filter(b => !b.is_sold);
-                    } else if (currentFilter === 'sold') {
-                        filteredBooks = books.filter(b => b.is_sold);
-                    }
-
-                    loadingMsg.style.display = 'none';
-
-                    if (filteredBooks.length === 0) {
-                        noBooksMsg.style.display = 'block';
-                    } else {
-                        noBooksMsg.style.display = 'none';
-                        filteredBooks.forEach(book => {
-                            container.appendChild(createBookCard(book, true));
-                        });
-                    }
-                } else {
-                    loadingMsg.style.display = 'none';
-                    container.innerHTML = '<p class="error-message">Failed to load books</p>';
-                }
-            } catch (error) {
-                loadingMsg.style.display = 'none';
-                container.innerHTML = '<p class="error-message">An error occurred</p>';
-            }
-        }
-
-        function createBookCard(book, isOwner = false) {
-            const card = document.createElement('div');
-            card.className = `book-card ${book.is_sold ? 'sold' : ''}`;
-            
-            const soldBadge = book.is_sold ? '<span class="sold-badge">SOLD</span>' : '';
-            const discountBadge = book.original_price && book.original_price > book.price ? 
-                `<span class="discount-badge">${Math.round((1 - book.price/book.original_price) * 100)}% OFF</span>` : '';
-            
-            card.innerHTML = `
-                ${soldBadge}
-                ${discountBadge}
-                <div class="book-image">
-                    ${book.image_url ? `<img src="${book.image_url}" alt="${book.title}">` : '<div class="book-placeholder">📖</div>'}
-                </div>
-                <div class="book-info">
-                    <h3>${book.title}</h3>
-                    <p class="book-author">by ${book.author}</p>
-                    <p class="book-condition">Condition: ${book.condition}</p>
-                    ${book.category ? `<p class="book-category">${book.category}</p>` : ''}
-                    <div class="book-price">
-                        <span class="price">₹${book.price.toFixed(2)}</span>
-                        ${book.original_price ? `<span class="original-price">₹${book.original_price.toFixed(2)}</span>` : ''}
-                    </div>
-                    ${isOwner ? `
-                        <div class="book-actions">
-                            <button class="btn btn-small" onclick="markAsSold(${book.id}, ${!book.is_sold})">
-                                ${book.is_sold ? 'Mark as Available' : 'Mark as Sold'}
-                            </button>
-                            <button class="btn btn-small btn-danger" onclick="deleteBook(${book.id})">Delete</button>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-            return card;
-        }
-
-        async function markAsSold(bookId, markAsSold) {
-            const token = localStorage.getItem('token');
-            try {
-                const response = await fetch(`/api/books/${bookId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Profile &amp; Book Management | BookMarket</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#727878",
+                        "secondary-fixed": "#dfe3e8",
+                        "surface-variant": "#e1e3e4",
+                        "surface": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#022020",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#462b1e",
+                        "secondary-container": "#dde0e6",
+                        "on-secondary-fixed": "#181c20",
+                        "tertiary": "#2e170b",
+                        "primary": "#032121",
+                        "surface-container-high": "#e7e8e9",
+                        "inverse-primary": "#aecccc",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-bright": "#f8f9fa",
+                        "on-secondary-container": "#5f6368",
+                        "tertiary-fixed": "#ffdbcc",
+                        "on-tertiary-fixed-variant": "#5e4032",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#c3c7cc",
+                        "on-primary-fixed-variant": "#304b4b",
+                        "inverse-surface": "#2e3132",
+                        "primary-fixed-dim": "#aecccc",
+                        "on-tertiary-container": "#b89180",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#e8bdaa",
+                        "surface-dim": "#d9dadb",
+                        "on-primary-container": "#829f9f",
+                        "secondary": "#5b5f64",
+                        "error": "#ba1a1a",
+                        "on-background": "#191c1d",
+                        "surface-tint": "#476363",
+                        "on-tertiary-fixed": "#2d160a",
+                        "on-surface": "#191c1d",
+                        "primary-fixed": "#cae8e8",
+                        "background": "#f8f9fa",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#414848",
+                        "surface-container-highest": "#e1e3e4",
+                        "primary-container": "#1a3636",
+                        "outline-variant": "#c1c8c7",
+                        "on-secondary-fixed-variant": "#43474c",
+                        "surface-container-low": "#f3f4f5",
+                        "error-container": "#ffdad6"
                     },
-                    body: JSON.stringify({ is_sold: markAsSold })
-                });
-
-                if (response.ok) {
-                    loadMyBooks();
-                } else {
-                    alert('Failed to update book status');
-                }
-            } catch (error) {
-                alert('An error occurred');
-            }
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
         }
-
-        async function deleteBook(bookId) {
-            if (!confirm('Are you sure you want to delete this book?')) return;
-            
-            const token = localStorage.getItem('token');
-            try {
-                const response = await fetch(`/api/books/${bookId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    loadMyBooks();
-                } else {
-                    alert('Failed to delete book');
-                }
-            } catch (error) {
-                alert('An error occurred');
-            }
-        }
-
-        window.markAsSold = markAsSold;
-        window.deleteBook = deleteBook;
     </script>
-</body>
-</html>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-[#032121]/80 backdrop-blur-xl shadow-[0_32px_64px_-15px_rgba(25,28,29,0.04)]">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<a href="/" class="text-2xl font-bold tracking-tighter text-[#032121] dark:text-[#f8f9fa]">BookMarket</a>
+<div class="hidden md:flex items-center space-x-8 font-manrope text-sm font-semibold tracking-tight">
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#032121] dark:hover:text-white transition-colors" href="/">Home</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#032121] dark:hover:text-white transition-colors" href="/books">Browse Books</a>
+<a class="text-[#032121] dark:text-white border-b-2 border-[#032121] dark:border-white pb-1" href="/profile">Profile</a>
+</div>
+<div class="flex items-center gap-4">
+<button type="button" class="p-2 hover:bg-slate-100/50 dark:hover:bg-white/10 rounded-lg transition-all active:scale-95" aria-label="Search">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</button>
+<div id="userAvatarInitials" class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-white text-xs font-bold">—</div>
+<button type="button" id="logoutBtn" class="hidden md:block font-manrope text-sm font-semibold text-slate-500 hover:text-primary transition-colors">Logout</button>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-32 px-6 max-w-7xl mx-auto">
+<!-- User Info Section -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12">
+<div class="flex items-center gap-6">
+<div class="relative group">
+<div id="userAvatarLarge" class="w-24 h-24 md:w-32 md:h-32 rounded-xl object-cover shadow-sm ring-4 ring-surface-container-low bg-primary-container flex items-center justify-center text-white text-2xl md:text-3xl font-bold">—</div>
+<button type="button" class="absolute -bottom-2 -right-2 bg-surface-container-lowest p-2 rounded-lg shadow-lg hover:bg-surface-container-high transition-colors text-primary active:scale-95" aria-label="Edit profile">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+<div>
+<div class="flex items-center gap-3">
+<h1 id="profileUsername" class="text-3xl font-extrabold tracking-tight text-primary">—</h1>
+<span id="memberSinceBadge" class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold tracking-widest uppercase">Member</span>
+</div>
+<p id="profileFullName" class="text-xl font-headline font-semibold text-on-surface-variant mt-1">—</p>
+<div class="flex items-center gap-4 mt-2 text-sm text-on-surface-variant/70">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base">mail</span>
+<span id="userEmailLine">—</span>
+</span>
+</div>
+</div>
+</div>
+<div class="flex gap-3">
+<button type="button" class="px-6 py-2.5 rounded-xl bg-surface-container-high text-on-surface font-semibold text-sm transition-all hover:bg-surface-container-highest active:scale-95">
+                        Account Settings
+                    </button>
+<a href="/books" class="px-6 py-2.5 rounded-xl bg-gradient-to-br from-primary to-primary-container text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all active:scale-95 inline-flex items-center justify-center">
+                        Add Your First Book
+                    </a>
+</div>
+</div>
+<!-- Stats Bar -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-1 bg-surface-container-low rounded-2xl">
+<div class="bg-surface-container-lowest p-4 rounded-xl text-center shadow-sm">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 mb-1">Total Books</p>
+<p id="statTotalBooks" class="text-2xl font-headline font-extrabold text-primary">0</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl text-center shadow-sm border border-transparent">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 mb-1">Active Listings</p>
+<p id="statActiveListings" class="text-2xl font-headline font-extrabold text-primary">0</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl text-center shadow-sm">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 mb-1">Books Sold</p>
+<p id="statBooksSold" class="text-2xl font-headline font-extrabold text-primary">0</p>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl text-center shadow-sm">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60 mb-1">Earnings</p>
+<p id="statEarnings" class="text-2xl font-headline font-extrabold text-primary">₹0</p>
+</div>
+</div>
+</section>
+<!-- Book Management Tabs -->
+<section class="mb-10">
+<div class="flex items-center justify-between border-b border-outline-variant/20 mb-8">
+<div class="flex gap-8">
+<button type="button" data-tab="all" class="profile-tab pb-4 text-sm font-bold tracking-tight text-primary border-b-2 border-primary">All Books</button>
+<button type="button" data-tab="available" class="profile-tab pb-4 text-sm font-semibold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors">Available</button>
+<button type="button" data-tab="sold" class="profile-tab pb-4 text-sm font-semibold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors">Sold</button>
+</div>
+<div class="hidden sm:flex items-center gap-2 mb-4">
+<span class="text-xs text-on-surface-variant/60 font-medium">Sort by:</span>
+<button type="button" class="flex items-center gap-1 text-xs font-bold text-primary">
+                        Recently Added
+                        <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+<!-- Books Display Section (Grid) -->
+<div id="myBooksContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+<a href="/books" data-add-book class="flex flex-col items-center justify-center p-8 bg-surface-container-low border-2 border-dashed border-outline-variant/30 rounded-2xl group hover:border-primary/30 transition-all aspect-[3/4]">
+<div class="w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-primary/40 group-hover:text-primary">
+<span class="material-symbols-outlined text-4xl">add</span>
+</div>
+<p class="font-headline font-bold text-primary">Add a New Book</p>
+<p class="text-xs text-on-surface-variant/60 mt-2 text-center">List another book from your library in seconds.</p>
+</a>
+</div>
+</section>
+<!-- Curator Tray (Specialized Component) -->
+<section class="mt-20 p-10 bg-tertiary-container rounded-[2rem] relative overflow-hidden">
+<div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="max-w-md">
+<h2 class="text-3xl font-headline font-extrabold text-white mb-3">Premium Seller Program</h2>
+<p class="text-on-tertiary-container leading-relaxed">Boost your listings, get lower transaction fees, and earn a verified curator badge on your profile. Join the top 5% of sellers in the BookMarket community.</p>
+<button type="button" class="mt-6 px-8 py-3 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-bold text-sm hover:opacity-90 transition-all active:scale-95">Upgrade to Curator</button>
+</div>
+<div class="flex gap-4 no-scrollbar overflow-x-auto pb-4">
+<div class="w-32 h-44 flex-shrink-0 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 flex items-center justify-center p-4 text-center">
+<span class="text-white/40 text-[10px] font-black uppercase tracking-widest">Priority Search</span>
+</div>
+<div class="w-32 h-44 flex-shrink-0 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 flex items-center justify-center p-4 text-center">
+<span class="text-white/40 text-[10px] font-black uppercase tracking-widest">Lower Fees</span>
+</div>
+<div class="w-32 h-44 flex-shrink-0 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 flex items-center justify-center p-4 text-center">
+<span class="text-white/40 text-[10px] font-black uppercase tracking-widest">Pro Analytics</span>
+</div>
+</div>
+</div>
+<!-- Decorative backdrop -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
+</section>
+</main>
+<!-- BottomNavBar (Shared Component - Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 md:hidden bg-white/90 dark:bg-[#032121]/90 backdrop-blur-lg border-t border-slate-200/10 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] rounded-t-2xl">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-4 py-1.5 hover:opacity-80 transition-opacity active:scale-90 duration-150" href="/">
+<span class="material-symbols-outlined">home</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-widest mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-4 py-1.5 hover:opacity-80 transition-opacity active:scale-90 duration-150" href="/books">
+<span class="material-symbols-outlined">search</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-widest mt-1">Browse</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-4 py-1.5 hover:opacity-80 transition-opacity active:scale-90 duration-150" href="/books">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-widest mt-1">My Books</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#1A3636] dark:bg-[#f8f9fa] text-white dark:text-[#032121] rounded-xl px-4 py-1.5 hover:opacity-80 transition-opacity active:scale-90 duration-150" href="/profile">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-widest mt-1">Profile</span>
+</a>
+</nav>
+<script src="/static/js/app.js"></script>
+<script>
+(function () {
+  var PLACEHOLDER_IMG =
+    "data:image/svg+xml," +
+    encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><rect fill="#e7e8e9" width="100%" height="100%"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#727878" font-family="system-ui,sans-serif" font-size="14">No image</text></svg>'
+    );
+
+  var allBooks = [];
+  var currentUser = null;
+  var currentFilter = "all";
+
+  var tabActive =
+    "pb-4 text-sm font-bold tracking-tight text-primary border-b-2 border-primary";
+  var tabInactive =
+    "pb-4 text-sm font-semibold tracking-tight text-on-surface-variant/60 hover:text-primary transition-colors";
+
+  function escapeHtml(t) {
+    if (t == null) return "";
+    var d = document.createElement("div");
+    d.textContent = t;
+    return d.innerHTML;
+  }
+
+  function escapeAttr(t) {
+    if (t == null) return "";
+    return String(t)
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;");
+  }
+
+  function initialsFromUser(user) {
+    var n = (user.full_name || user.username || "?").trim();
+    var p = n.split(/\s+/).filter(Boolean);
+    if (p.length >= 2) return (p[0][0] + p[p.length - 1][0]).toUpperCase();
+    return n.slice(0, 2).toUpperCase();
+  }
+
+  function formatMemberSince(iso) {
+    if (!iso) return "Member";
+    try {
+      var d = new Date(iso);
+      return "Member Since " + d.getFullYear();
+    } catch (e) {
+      return "Member";
+    }
+  }
+
+  function formatSoldDate(iso) {
+    if (!iso) return "";
+    try {
+      var d = new Date(iso);
+      return (
+        "Sold on " +
+        d.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
+      );
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function authHeaders() {
+    var t = localStorage.getItem("token");
+    return { Authorization: "Bearer " + t };
+  }
+
+  function updateStats(books) {
+    var total = books.length;
+    var sold = books.filter(function (b) {
+      return b.is_sold;
+    });
+    var available = books.filter(function (b) {
+      return !b.is_sold;
+    });
+    var earnings = sold.reduce(function (s, b) {
+      return s + (Number(b.price) || 0);
+    }, 0);
+    document.getElementById("statTotalBooks").textContent = String(total);
+    document.getElementById("statActiveListings").textContent = String(
+      available.length
+    );
+    document.getElementById("statBooksSold").textContent = String(sold.length);
+    document.getElementById("statEarnings").textContent =
+      "₹" + earnings.toFixed(2);
+  }
+
+  function setTabStyles(activeTab) {
+    document.querySelectorAll(".profile-tab").forEach(function (btn) {
+      var tab = btn.getAttribute("data-tab");
+      btn.className =
+        "profile-tab " + (tab === activeTab ? tabActive : tabInactive);
+    });
+  }
+
+  function createAvailableCard(book) {
+    var imgSrc = book.image_url ? String(book.image_url) : PLACEHOLDER_IMG;
+    var cat = book.category
+      ? '<span class="px-2.5 py-1 rounded-lg bg-primary/80 backdrop-blur-md text-white text-[10px] font-extrabold uppercase tracking-wider shadow-sm">' +
+        escapeHtml(book.category) +
+        "</span>"
+      : "";
+    var wrap = document.createElement("div");
+    wrap.className =
+      "group relative bg-surface-container-lowest rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1";
+    wrap.innerHTML =
+      '<div class="aspect-[3/4] relative overflow-hidden bg-surface-container">' +
+      '<img alt="' +
+      escapeAttr(book.title) +
+      '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="" src="' +
+      escapeAttr(imgSrc) +
+      '"/>' +
+      '<div class="absolute top-3 left-3 flex gap-2 flex-wrap">' +
+      '<span class="px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md text-[#032121] text-[10px] font-extrabold uppercase tracking-wider shadow-sm">Available</span>' +
+      cat +
+      "</div>" +
+      '<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">' +
+      '<button type="button" class="w-10 h-10 rounded-full bg-white text-primary flex items-center justify-center shadow-lg hover:scale-110 transition-transform" aria-label="Edit listing">' +
+      '<span class="material-symbols-outlined">edit</span>' +
+      "</button>" +
+      '<button type="button" class="mark-sold-btn w-10 h-10 rounded-full bg-white text-green-600 flex items-center justify-center shadow-lg hover:scale-110 transition-transform" data-book-id="' +
+      book.id +
+      '" aria-label="Mark as sold">' +
+      '<span class="material-symbols-outlined">check_circle</span>' +
+      "</button>" +
+      '<button type="button" class="delete-book-btn w-10 h-10 rounded-full bg-white text-error flex items-center justify-center shadow-lg hover:scale-110 transition-transform" data-book-id="' +
+      book.id +
+      '" aria-label="Delete book">' +
+      '<span class="material-symbols-outlined">delete</span>' +
+      "</button>" +
+      "</div>" +
+      "</div>" +
+      '<div class="p-5">' +
+      '<div class="flex justify-between items-start gap-2 mb-1">' +
+      '<h3 class="font-headline font-bold text-lg text-primary leading-tight">' +
+      escapeHtml(book.title) +
+      "</h3>" +
+      '<span class="font-headline font-extrabold text-primary">₹' +
+      Number(book.price).toFixed(2) +
+      "</span>" +
+      "</div>" +
+      '<p class="text-sm text-on-surface-variant font-medium mb-4 italic">' +
+      escapeHtml(book.author) +
+      "</p>" +
+      '<div class="flex items-center justify-between">' +
+      '<span class="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest">Condition: ' +
+      escapeHtml(book.condition) +
+      "</span>" +
+      '<span class="text-xs font-bold text-primary underline underline-offset-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Promote Listing</span>' +
+      "</div>" +
+      "</div>";
+
+    wrap.querySelector(".mark-sold-btn").addEventListener("click", function (e) {
+      e.stopPropagation();
+      markAsSold(book.id, true);
+    });
+    wrap.querySelector(".delete-book-btn").addEventListener("click", function (e) {
+      e.stopPropagation();
+      deleteBook(book.id);
+    });
+    return wrap;
+  }
+
+  function createSoldCard(book) {
+    var imgSrc = book.image_url ? String(book.image_url) : PLACEHOLDER_IMG;
+    var wrap = document.createElement("div");
+    wrap.className =
+      "group relative bg-surface-container-low rounded-2xl overflow-hidden grayscale transition-all duration-300";
+    wrap.innerHTML =
+      '<div class="aspect-[3/4] relative overflow-hidden bg-surface-container">' +
+      '<img alt="' +
+      escapeAttr(book.title) +
+      '" class="w-full h-full object-cover" data-alt="" src="' +
+      escapeAttr(imgSrc) +
+      '"/>' +
+      '<div class="absolute inset-0 bg-on-surface/40 flex items-center justify-center">' +
+      '<span class="px-4 py-2 rounded-xl bg-white/20 backdrop-blur-md text-white border border-white/30 text-xs font-black uppercase tracking-[0.2em]">Sold Out</span>' +
+      "</div>" +
+      "</div>" +
+      '<div class="p-5 opacity-60">' +
+      '<div class="flex justify-between items-start gap-2 mb-1">' +
+      '<h3 class="font-headline font-bold text-lg text-primary leading-tight">' +
+      escapeHtml(book.title) +
+      "</h3>" +
+      '<span class="font-headline font-extrabold text-primary">₹' +
+      Number(book.price).toFixed(2) +
+      "</span>" +
+      "</div>" +
+      '<p class="text-sm text-on-surface-variant font-medium mb-4 italic">' +
+      escapeHtml(book.author) +
+      "</p>" +
+      '<p class="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest">' +
+      escapeHtml(formatSoldDate(book.sold_at) || "Sold") +
+      "</p>" +
+      '<div class="mt-3 flex flex-wrap gap-2">' +
+      '<button type="button" class="mark-available-btn text-xs font-bold text-primary underline underline-offset-4" data-book-id="' +
+      book.id +
+      '">Mark as Available</button>' +
+      '<button type="button" class="delete-book-btn text-xs font-bold text-error underline underline-offset-4" data-book-id="' +
+      book.id +
+      '">Delete</button>' +
+      "</div>" +
+      "</div>";
+
+    wrap.querySelector(".mark-available-btn").addEventListener("click", function () {
+      markAsSold(book.id, false);
+    });
+    wrap.querySelector(".delete-book-btn").addEventListener("click", function () {
+      deleteBook(book.id);
+    });
+    return wrap;
+  }
+
+  function renderBooks() {
+    var container = document.getElementById("myBooksContainer");
+    if (!container) return;
+    var addLink = container.querySelector("[data-add-book]");
+    Array.prototype.slice.call(container.children).forEach(function (child) {
+      if (child !== addLink) container.removeChild(child);
+    });
+    var filtered = allBooks;
+    if (currentFilter === "available") {
+      filtered = allBooks.filter(function (b) {
+        return !b.is_sold;
+      });
+    } else if (currentFilter === "sold") {
+      filtered = allBooks.filter(function (b) {
+        return b.is_sold;
+      });
+    }
+    if (filtered.length === 0) {
+      var empty = document.createElement("div");
+      empty.className =
+        "col-span-full text-center py-12 text-on-surface-variant";
+      empty.textContent = "No books in this view.";
+      container.insertBefore(empty, addLink);
+      return;
+    }
+    filtered.forEach(function (book) {
+      container.insertBefore(
+        book.is_sold ? createSoldCard(book) : createAvailableCard(book),
+        addLink
+      );
+    });
+  }
+
+  async function loadUserInfo() {
+    var token = localStorage.getItem("token");
+    var response = await fetch("/api/auth/me", {
+      headers: { Authorization: "Bearer " + token },
+    });
+    if (!response.ok) throw new Error("auth/me failed");
+    var user = await response.json();
+    console.log("profile user data", user);
+    currentUser = user;
+    document.getElementById("profileUsername").textContent = user.username || "—";
+    document.getElementById("profileFullName").textContent =
+      user.full_name || user.username || "—";
+    document.getElementById("userEmailLine").textContent = user.email || "—";
+    document.getElementById("memberSinceBadge").textContent = formatMemberSince(
+      user.created_at
+    );
+    var ini = initialsFromUser(user);
+    document.getElementById("userAvatarInitials").textContent = ini;
+    document.getElementById("userAvatarLarge").textContent = ini;
+    return user;
+  }
+
+  async function loadMyBooks() {
+    var token = localStorage.getItem("token");
+    var response = await fetch("/api/users/me/books", {
+      headers: { Authorization: "Bearer " + token },
+    });
+    if (!response.ok) throw new Error("me/books failed");
+    var books = await response.json();
+    console.log("profile books data", books);
+    allBooks = books;
+    updateStats(allBooks);
+    renderBooks();
+  }
+
+  async function markAsSold(bookId, markSold) {
+    var token = localStorage.getItem("token");
+    try {
+      var response = await fetch("/api/books/" + bookId, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({ is_sold: markSold }),
+      });
+      if (response.ok) {
+        await loadMyBooks();
+      } else {
+        alert("Failed to update book status");
+      }
+    } catch (e) {
+      alert("An error occurred");
+    }
+  }
+
+  async function deleteBook(bookId) {
+    if (!confirm("Are you sure you want to delete this book?")) return;
+    var token = localStorage.getItem("token");
+    try {
+      var response = await fetch("/api/books/" + bookId, {
+        method: "DELETE",
+        headers: { Authorization: "Bearer " + token },
+      });
+      if (response.ok) {
+        await loadMyBooks();
+      } else {
+        alert("Failed to delete book");
+      }
+    } catch (e) {
+      alert("An error occurred");
+    }
+  }
+
+  window.markAsSold = markAsSold;
+  window.deleteBook = deleteBook;
+
+  function initLogout() {
+    var btn = document.getElementById("logoutBtn");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      if (typeof logout === "function") logout();
+      else {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
+    });
+  }
+
+  async function init() {
+    if (typeof isAuthenticated === "function" && !isAuthenticated()) {
+      window.location.href = "/login";
+      return;
+    }
+    if (!localStorage.getItem("token")) {
+      window.location.href = "/login";
+      return;
+    }
+    initLogout();
+    try {
+      await loadUserInfo();
+      await loadMyBooks();
+    } catch (e) {
+      console.log("profile init error", e);
+      window.location.href = "/login";
+    }
+
+    document.querySelectorAll(".profile-tab").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        currentFilter = btn.getAttribute("data-tab") || "all";
+        setTabStyles(currentFilter);
+        renderBooks();
+      });
+    });
+  }
+
+  init();
+})();
+</script>
+</body></html>

@@ -73,37 +73,67 @@ async function loadBooks() {
 
 function createBookCard(book) {
     const card = document.createElement('div');
-    card.className = 'book-card';
-    
-    const discountBadge = book.original_price && book.original_price > book.price ? 
-        `<span class="discount-badge">${Math.round((1 - book.price/book.original_price) * 100)}% OFF</span>` : '';
-    
+    card.className = 'bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden flex flex-col';
+
+    const discountBadge = book.original_price && book.original_price > book.price 
+        ? `<span class="absolute top-3 left-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+            ${Math.round((1 - book.price/book.original_price) * 100)}% OFF
+           </span>` 
+        : '';
+
     card.innerHTML = `
-        ${discountBadge}
-        <div class="book-image">
-            ${book.image_url ? `<img src="${book.image_url}" alt="${book.title}">` : '<div class="book-placeholder">📖</div>'}
+        <div class="relative">
+            ${discountBadge}
+            ${
+                book.image_url 
+                ? `<img src="${book.image_url}" alt="${book.title}" class="w-full h-48 object-cover">`
+                : `<div class="w-full h-48 flex items-center justify-center bg-gray-100 text-3xl">📖</div>`
+            }
         </div>
-        <div class="book-info">
-            <h3>${book.title}</h3>
-            <p class="book-author">by ${book.author}</p>
-            <p class="book-condition">Condition: ${book.condition}</p>
-            ${book.category ? `<p class="book-category">${book.category}</p>` : ''}
-            ${book.description ? `<p style="color: var(--text-light); font-size: 0.875rem; margin-top: 0.5rem;">${book.description.substring(0, 100)}${book.description.length > 100 ? '...' : ''}</p>` : ''}
-            <div class="book-price">
-                <span class="price">₹${book.price.toFixed(2)}</span>
-                ${book.original_price ? `<span class="original-price">₹${book.original_price.toFixed(2)}</span>` : ''}
+
+        <div class="p-4 flex flex-col flex-grow">
+            <h3 class="font-bold text-lg text-gray-800 line-clamp-1">${book.title}</h3>
+            <p class="text-sm text-gray-500 mb-1">by ${book.author}</p>
+
+            <span class="text-xs px-2 py-1 rounded-full w-fit mb-2
+                ${book.condition === 'New' ? 'bg-green-100 text-green-700' : 
+                  book.condition === 'Like New' ? 'bg-blue-100 text-blue-700' :
+                  'bg-yellow-100 text-yellow-700'}">
+                ${book.condition}
+            </span>
+
+            ${book.category ? `<p class="text-xs text-gray-400 mb-2">${book.category}</p>` : ''}
+
+            ${book.description 
+                ? `<p class="text-sm text-gray-500 mb-3">
+                    ${book.description.substring(0, 80)}${book.description.length > 80 ? '...' : ''}
+                  </p>` 
+                : ''}
+
+            <div class="mt-auto">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-lg font-bold text-gray-900">₹${book.price.toFixed(2)}</span>
+                    ${book.original_price 
+                        ? `<span class="text-sm line-through text-gray-400">₹${book.original_price.toFixed(2)}</span>` 
+                        : ''}
+                </div>
+
+                ${
+                    !book.is_sold
+                    ? `<button 
+                        class="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition"
+                        onclick="buyBook(${book.id})">
+                        Buy Now
+                       </button>`
+                    : `<button 
+                        class="w-full bg-gray-300 text-gray-600 py-2 rounded-lg cursor-not-allowed" disabled>
+                        Sold Out
+                       </button>`
+                }
             </div>
-            ${!book.is_sold ? `
-            <div class="book-actions" style="margin-top: 1rem;">
-                <button class="btn btn-primary btn-block" onclick="buyBook(${book.id})">Buy Now</button>
-            </div>
-            ` : `
-            <div class="book-actions" style="margin-top: 1rem;">
-                <button class="btn btn-block" disabled style="background: var(--text-light); cursor: not-allowed;">Sold Out</button>
-            </div>
-            `}
         </div>
     `;
+
     return card;
 }
 

@@ -52,9 +52,13 @@ async def read_root():
 async def login_page():
     return FileResponse("templates/login.html")
 
+@app.get("/register", response_class=HTMLResponse)
+async def register_page():
+    return FileResponse("templates/register.html")
+
 @app.get("/books", response_class=HTMLResponse)
 async def books_page():
-    return FileResponse("templates/books.html")
+    return FileResponse("templates/browse_books.html")
 
 @app.get("/profile", response_class=HTMLResponse)
 async def profile_page():
