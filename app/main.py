@@ -165,3 +165,7 @@ def delete_book(book_id: int, current_user: models.User = Depends(auth.get_curre
 def get_my_books(current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
     books = db.query(models.Book).filter(models.Book.seller_id == current_user.id).all()
     return books
+
+@app.get("/wishlist", response_class=HTMLResponse)
+async def wishlist_page():
+    return FileResponse("templates/wishlist.html")
