@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed": "#ffdbcc",
+              "outline": "#727878",
+              "inverse-primary": "#aecccc",
+              "tertiary-fixed-dim": "#e8bdaa",
+              "surface": "#f8f9fa",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed-dim": "#c3c7cc",
+              "on-primary-container": "#829f9f",
+              "on-error": "#ffffff",
+              "outline-variant": "#c1c8c7",
+              "secondary-fixed": "#dfe3e8",
+              "on-primary": "#ffffff",
+              "surface-variant": "#e1e3e4",
+              "surface-tint": "#476363",
+              "secondary": "#5b5f64",
+              "on-tertiary-fixed": "#2d160a",
+              "on-secondary-fixed": "#181c20",
+              "on-primary-fixed": "#022020",
+              "surface-container-high": "#e7e8e9",
+              "on-primary-fixed-variant": "#304b4b",
+              "on-error-container": "#93000a",
+              "background": "#f8f9fa",
+              "on-surface-variant": "#414848",
+              "tertiary": "#2e170b",
+              "on-secondary-fixed-variant": "#43474c",
+              "surface-container-highest": "#e1e3e4",
+              "primary-container": "#1a3636",
+              "primary": "#032121",
+              "surface-container": "#edeeef",
+              "secondary-container": "#dde0e6",
+              "surface-container-low": "#f3f4f5",
+              "on-secondary": "#ffffff",
+              "inverse-on-surface": "#f0f1f2",
+              "error-container": "#ffdad6",
+              "surface-bright": "#f8f9fa",
+              "primary-fixed": "#cae8e8",
+              "inverse-surface": "#2e3132",
+              "primary-fixed-dim": "#aecccc",
+              "on-background": "#191c1d",
+              "on-tertiary-container": "#b89180",
+              "on-surface": "#191c1d",
+              "on-tertiary-fixed-variant": "#5e4032",
+              "error": "#ba1a1a",
+              "surface-dim": "#d9dadb",
+              "on-tertiary": "#ffffff",
+              "on-secondary-container": "#5f6368",
+              "tertiary-container": "#462b1e"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"],
+              "mono": ["JetBrains Mono"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .headline-font { font-family: 'Manrope', sans-serif; }
+        
+        /* Custom success animation simulation via CSS */
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .animate-success {
+            animation: scaleIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        /* Subtle fade up for content */
+        @keyframes fadeUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fade-up {
+            animation: fadeUp 0.8s ease-out forwards;
+        }
+
+        /* Gradient for primary CTA as requested */
+        .primary-gradient {
+            background: linear-gradient(135deg, #032121 0%, #1a3636 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- TopNavBar - As per Shared Components JSON -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm shadow-black/5">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-7xl mx-auto">
+<div class="text-xl font-black text-[#032121] dark:text-[#f8f9fa] tracking-tight headline-font">
+                The Digital Curator
+            </div>
+<nav class="hidden md:flex items-center space-x-8">
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-[#1A3636] dark:hover:text-white transition-colors duration-200" href="#">Library</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-[#1A3636] dark:hover:text-white transition-colors duration-200" href="#">Discover</a>
+<a class="text-[#032121] dark:text-[#f8f9fa] font-bold border-b-2 border-[#032121]" href="#">Orders</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:text-[#1A3636] dark:hover:text-white transition-colors duration-200" href="#">Account</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="scale-95 active:opacity-80 transition-transform text-[#032121] dark:text-[#f8f9fa]">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+</button>
+<button class="scale-95 active:opacity-80 transition-transform text-[#032121] dark:text-[#f8f9fa]">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content: Success Canvas -->
+<main class="flex-grow flex items-center justify-center px-4 pt-24 pb-12">
+<div class="w-full max-w-[500px] animate-fade-up">
+<!-- Success Card -->
+<div class="bg-surface-container-lowest rounded-[2rem] p-8 md:p-12 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.04)] text-center relative overflow-hidden">
+<!-- Background Decorative Element (Subtle) -->
+<div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-primary-container"></div>
+<!-- Success Icon -->
+<div class="mb-8 flex justify-center">
+<div class="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center animate-success">
+<span class="material-symbols-outlined text-6xl text-green-600" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<!-- Title & Message -->
+<h1 class="headline-font text-3xl font-extrabold text-[#032121] mb-4 tracking-tight">
+                    Payment Successful!
+                </h1>
+<p class="text-on-surface-variant text-lg leading-relaxed font-body mb-10 max-w-[320px] mx-auto">
+                    Thank you for your purchase! Your books are being prepared for shipment.
+                </p>
+<!-- Transaction Details Area -->
+<div class="bg-surface-container-low rounded-xl p-6 mb-10 text-left">
+<div class="flex justify-between items-center mb-4">
+<span class="text-sm font-semibold uppercase tracking-widest text-on-surface-variant font-label">Transaction Details</span>
+<span class="material-symbols-outlined text-on-surface-variant text-lg" data-icon="content_copy">content_copy</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between">
+<span class="text-on-surface-variant font-body">Order ID</span>
+<span class="font-mono font-bold text-[#032121] tracking-tighter">#BM-8829-XPL</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant font-body">Date</span>
+<span class="text-on-surface font-semibold">Oct 24, 2023</span>
+</div>
+<div class="flex justify-between pt-3 border-t border-outline-variant/20">
+<span class="text-on-surface-variant font-body">Amount</span>
+<span class="text-on-surface font-bold headline-font">$142.50</span>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-4">
+<button class="primary-gradient text-white font-semibold py-4 px-8 rounded-xl scale-95 active:scale-90 transition-all duration-200 shadow-lg shadow-primary/10 flex items-center justify-center gap-2">
+<span>Continue Shopping</span>
+<span class="material-symbols-outlined text-lg" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="bg-surface-container-high text-on-surface font-semibold py-4 px-8 rounded-xl hover:bg-surface-container-highest transition-colors active:scale-95 duration-200">
+                        View My Orders
+                    </button>
+</div>
+</div>
+<!-- Trust Badges / Footer -->
+<div class="mt-8 flex justify-center items-center gap-8 opacity-40">
+<div class="flex items-center gap-2 grayscale">
+<span class="material-symbols-outlined text-xl" data-icon="verified_user">verified_user</span>
+<span class="text-xs font-bold uppercase tracking-widest font-label">Secure Checkout</span>
+</div>
+<div class="flex items-center gap-2 grayscale">
+<span class="material-symbols-outlined text-xl" data-icon="local_shipping">local_shipping</span>
+<span class="text-xs font-bold uppercase tracking-widest font-label">Express Delivery</span>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar - Mobile Only - As per Shared Components JSON -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] z-50 rounded-t-2xl">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 tap-highlight-transparent active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+<span class="font-['Inter'] text-[11px] font-semibold uppercase tracking-wider mt-1">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 tap-highlight-transparent active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-['Inter'] text-[11px] font-semibold uppercase tracking-wider mt-1">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#032121] dark:text-[#f8f9fa] bg-[#edeeef] dark:bg-slate-800 rounded-xl px-4 py-1 tap-highlight-transparent active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-['Inter'] text-[11px] font-semibold uppercase tracking-wider mt-1">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 tap-highlight-transparent active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] text-[11px] font-semibold uppercase tracking-wider mt-1">Account</span>
+</a>
+</nav>
+<!-- Curator Tray (Specialized Component) - Positioned as a 'You might also like' after success -->
+<section class="w-full bg-tertiary-container mt-auto py-16 px-6">
+<div class="max-w-7xl mx-auto">
+<div class="flex justify-between items-end mb-10">
+<div>
+<h2 class="headline-font text-2xl font-bold text-on-tertiary-container mb-2">Curated for your next read</h2>
+<p class="text-on-tertiary-container/70 font-body">Based on your recent acquisition</p>
+</div>
+<button class="text-on-tertiary-container font-semibold flex items-center gap-1 hover:underline underline-offset-4">
+                    Explore collection
+                    <span class="material-symbols-outlined text-sm" data-icon="open_in_new">open_in_new</span>
+</button>
+</div>
+<div class="flex gap-6 overflow-x-auto pb-8 snap-x no-scrollbar">
+<!-- Book Card 1 -->
+<div class="flex-shrink-0 w-48 snap-start group cursor-pointer">
+<div class="aspect-[2/3] bg-surface-container-high rounded-xl overflow-hidden mb-4 shadow-sm group-hover:shadow-xl transition-all duration-300">
+<img alt="Book Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="minimalist book cover with abstract geometric shapes in muted earthy tones on a clean background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjye5E-xzFpbQzJd5tYvLQmZm-f0M-i-OtpMP0IEiH0KeGct7F6sG_80XNUZDCUWl74WEcByDvYpwfSjb6oFFK6k4lqtvUEzmlxfMz_IlBW_XcOTSViHzvUwULFcqTH4g22hx02nc9bHIPiCcOswDFPICaD_fL3NjS7iLcIzv0JY5zzlNxQpqDiZ6GfULhD8JMdaPbnS1N0mK1NzhHBE9i1qXT3UCiBT2ZCgfI_rNPcOwsc4h2ItwHNM_8aDxrnJGMgyZpfddTCChc"/>
+</div>
+<h3 class="font-headline font-bold text-on-tertiary-container leading-tight">The Art of Focus</h3>
+<p class="text-sm text-on-tertiary-container/60 font-body">Marcus Aurelius</p>
+</div>
+<!-- Book Card 2 -->
+<div class="flex-shrink-0 w-48 snap-start group cursor-pointer">
+<div class="aspect-[2/3] bg-surface-container-high rounded-xl overflow-hidden mb-4 shadow-sm group-hover:shadow-xl transition-all duration-300">
+<img alt="Book Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="thick hardcover book spine with elegant gold embossed lettering and dark navy linen texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMjECKBwr-XHG9HbqJXzccnVUd8JJrNpS3Cl4YgT9P3yA8ZS8AJd8Y41khFWtFq9zqswdW41hWbQED33DSu-utOjrMcXKEWXG960q3cuL0sZU91BOnnLmTuQn5H2G8KETdYJ2md8d2mruHdX4CHlQQAUlixmYLVipu5-uG2cgVdinw6d-Kee61NEr6CxIGM3AXmcaErbtZuGNnZm80mGtP7TjlN288frBUjmdTtaxq5htoncznNXw0_iwM4lwzb62Sa2jCiZh0XOR9"/>
+</div>
+<h3 class="font-headline font-bold text-on-tertiary-container leading-tight">Digital Minimalism</h3>
+<p class="text-sm text-on-tertiary-container/60 font-body">Cal Newport</p>
+</div>
+<!-- Book Card 3 -->
+<div class="flex-shrink-0 w-48 snap-start group cursor-pointer">
+<div class="aspect-[2/3] bg-surface-container-high rounded-xl overflow-hidden mb-4 shadow-sm group-hover:shadow-xl transition-all duration-300">
+<img alt="Book Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="stack of vintage books with worn leather covers on an antique wooden desk in a dimly lit library" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjX7T4toUZmlg2u72uMOwZimP0ttoLPk9WgcQWASmwBdd6HtHgc9LOQRD8bY7pTxVnSlhXt6U7zU0KTBj4gqYxjX_s6Dv00q67fBRhWQK44yKQ3NzYt4YEBpJUSz0RfAdikWSvgswkLkPhI8-ptaZoYtPulWUXkjrDJ7MbBxDvsr77lN-2pJRQSyeVm5oCDE3Rdx5QhPwOo7vBgqOnTaqDxJw9ramegabts7o2pkj06OHagX8oJ46oa4eoiWxACmWryNBWbLzeSlbw"/>
+</div>
+<h3 class="font-headline font-bold text-on-tertiary-container leading-tight">Architectural Void</h3>
+<p class="text-sm text-on-tertiary-container/60 font-body">Zaha Hadid</p>
+</div>
+<!-- Book Card 4 -->
+<div class="flex-shrink-0 w-48 snap-start group cursor-pointer">
+<div class="aspect-[2/3] bg-surface-container-high rounded-xl overflow-hidden mb-4 shadow-sm group-hover:shadow-xl transition-all duration-300">
+<img alt="Book Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="open book on white sheets with soft morning sunlight streaming through a window creating long shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEQ1oN-uvbodB7moOKNhqq0tKBmilscnH0GTQeQXB-NUtltLC2ZY6_1GvOSsY_WELoOp2Nb3uO8mtf5QPWKZg5FnX9xJSPnHJQlEBl7yGLvNr0erebuz57TEeuj8DKNlwhenuyToPafxnC3fW0Tg3_xylEteunxlr1mxpyEUnoSUbUKdrEslT9BX3oX56OFXIvdNjzKvnvCGccf9QolTiYeO5FzJ8PBO-AvW8l2hj7l8Jy1UV27pF-vf7mIYSz4d1RIJvA2alQdvBU"/>
+</div>
+<h3 class="font-headline font-bold text-on-tertiary-container leading-tight">Essentialism</h3>
+<p class="text-sm text-on-tertiary-container/60 font-body">Greg McKeown</p>
+</div>
+</div>
+</div>
+</section>
+<footer class="bg-surface py-12 px-6 text-center">
+<p class="text-on-surface-variant font-label text-xs uppercase tracking-[0.2em]">The Digital Curator © 2023 — Editorial Selection</p>
+</footer>
+<style>
+        /* Custom scrollbar hiding for the tray */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>
