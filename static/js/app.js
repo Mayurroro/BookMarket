@@ -93,11 +93,18 @@ function createBookCard(book) {
                 <span class="price">₹${book.price.toFixed(2)}</span>
                 ${book.original_price ? `<span class="original-price">₹${book.original_price.toFixed(2)}</span>` : ''}
             </div>
+
             ${!book.is_sold ? `
-            <div class="book-actions" style="margin-top: 1rem;">
+           <div class="book-actions" style="margin-top: 1rem;">
                 <button class="btn btn-primary btn-block" onclick="buyBook(${book.id})">Buy Now</button>
-            </div>
-            ` : `
+    
+                <button class="btn btn-secondary btn-block" 
+                    onclick="addToWishlist(${book.id}, '${book.title}', ${book.price})"
+                    style="margin-top: 0.5rem;">
+                    ❤️ Wishlist
+                </button>
+           </div>
+           ` : `
             <div class="book-actions" style="margin-top: 1rem;">
                 <button class="btn btn-block" disabled style="background: var(--text-light); cursor: not-allowed;">Sold Out</button>
             </div>
@@ -119,3 +126,15 @@ function buyBook(bookId) {
     // Redirect to payment page with book ID
     window.location.href = `/payment?bookId=${bookId}`;
 }
+async function addToWishlist(id, name, price) {
+    const response = await fetch("http://127.0.0.1:8000/wishlist/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id, name, price })
+    });
+
+    const data = await response.json();
+    console.log("Wishlist:", data);
+} 
