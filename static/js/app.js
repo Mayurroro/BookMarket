@@ -104,7 +104,9 @@ async function loadBooks() {
                 if (noBooksMsg) noBooksMsg.style.display = 'block';
             } else {
                 books.forEach(book => {
-                    container.appendChild(createBookCard(book));
+                    const card = createBookCard(book);
+                    card.style.animationDelay = `${index * 0.1}s`;
+                    container.appendChild(card);
                 });
             }
             
@@ -123,7 +125,7 @@ async function loadBooks() {
 
 function createBookCard(book) {
     const card = document.createElement('div');
-    card.className = 'book-card';
+    card.className = 'book-card fade-in';
     
     const discountBadge = book.original_price && book.original_price > book.price ? 
         `<span class="discount-badge">${Math.round((1 - book.price/book.original_price) * 100)}% OFF</span>` : '';
