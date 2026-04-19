@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from typing import List
+
 import os
 
 from app import models, schemas, auth
@@ -208,3 +209,21 @@ def delete_book(book_id: int, current_user: models.User = Depends(auth.get_curre
 def get_my_books(current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
     books = db.query(models.Book).filter(models.Book.seller_id == current_user.id).all()
     return books
+
+# temporary storage (later you can use database)
+wishlist = []
+
+@app.post("/wishlist/add")
+def add_to_wishlist(item: dict):
+    wishlist.append(item)
+    return {"message": "Item added to wishlist", "wishlist": wishlist}
+
+@app.get("/wishlist")
+def get_wishlist():
+    return {"wishlist": wishlist}
+
+@app.delete("/wishlist/remove/{item_id}")
+def remove_from_wishlist(item_id: int):
+    global wishlist
+    wishlist = [item for item in wishlist if item.get("id") != item_id]
+    return {"message": "Item removed", "wishlist": wishlist}
