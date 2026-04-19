@@ -148,7 +148,7 @@
 <img class="w-full h-full object-cover" alt="" data-alt="aesthetic library setting with rows of books and warm ambient lighting creating a scholarly atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0XNfpiRtbbqTA2lMim_BDXkuQcfA_GFMFlGvkRzpTqYzVtlE7pcMs02hPrOuSxdMT4KdO5Ws0v8kNY5iTDg4eOc_NQ1IfUBIItvvcyaEY3XeXVsX0vQ-eIa4EvpxcZXzPqrtDg2nx2EDiOKU0mnUhwhGzIk7yc6_OX6tMbl5vo6fBqMsG0lvaPnA0rw_CEASFrOVHMMvDbg6ZCIUgBaKGgaNIjrHzr6vc8K0YzBwPkON4tEbxThoJjhYPQ16XU3QxXGbs72PEiryk"/>
 </div>
 <div class="aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl rotate-[-1deg]">
-<img class="w-full h-full object-cover" alt="" data-alt="modern book cover design with bold typography leaning against a solid architectural gray wall" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjN8r4CI4a5XL-msomQ-2Yav0RqlznDuRFsImbwb1oO0Xb1nJYD4Vxc_4qak8tWiOEBwW-LyQInv8WRBwkDCCib43GE3EcQVXRBfLrnwdQVRk1eqedyRKUTVbGSmzPAe8OiRvJvvZ4bLaXWXQMZFin7ToZW79Me5wzupJq-qdlmnZ72FANO7YbW6zl9yHzV89IVNRFW4OI095-PhTmMiijCRRSueQebMSdNlMI5Fs5eZuafYcbDaoOoSRBBVT8wwP79POya9WXa9ND"/>
+<img class="w-full h-full object-cover" alt="" data-alt="modern book cover design with bold typography leaning against a solid architectural gray wall" src="https://wallpapers.com/images/high/aesthetic-books-pictures-780-x-1040-njezy8o7tql2ph6q.webp"/>
 </div>
 </div>
 </div>
@@ -518,8 +518,18 @@
 
     <script src="/static/js/app.js"></script>
     <script>
-        loadBooks();
-        checkAuthStatus();
+        function loadBooks() {
+  const books = [
+    { title: "Ikigai", price: 350 },
+    { title: "The Alchemist", price: 500 }
+  ];
+
+  console.log("Mock books loaded", books);
+}
+
+function checkAuthStatus() {
+  console.log("User not logged in (mock)");
+}
     </script>
 </body>
 </html>
